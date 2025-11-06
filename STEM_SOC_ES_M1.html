@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Bee Game</title>
+    <link rel="stylesheet" href="QUIZ_BEE_CHALLENGE.css">
+    <link rel="icon" href="LOGO_THREE_STEM_SOCIETY.png">
+</head>
+<body>
+
+<section class="SECTION_ONE">  
+    <div class="SECTION_ONE_INTRODUCTORY">
+        <h1>INSTRUCTION</h1>
+        <p>
+            Select the correct answer for each question. You have 3 lives to complete the quiz. 
+            If you choose the wrong answer or run out of time, you will lose a life. 
+            Once all your lives are gone, the quiz will end. Good luck!
+        </p>
+        <a href="STEM_SOC_QUIZ.html">GO BACK</a>
+    </div>
+
+    <div class="quiz-container">
+        <div id="quiz" style="display: none;">
+            <div id="lives" class="lives">Lives: 3</div>
+            <div id="timer" class="timer">Time: 10</div>
+            <div id="question" class="question">Press Start to Begin</div>
+            <div id="answers" class="answers"></div>
+        </div>
+        <button id="startBtn" class="start-btn">Start</button>
+        <div id="gameOver" class="game-over" style="display: none;"></div>
+    </div>
+</section>
+
+
+ <footer class="footer">
+    <div class="footer-container">
+        <div class="footer-section">
+           <h2>  <i class="fa-regular fa-address-book"></i> Contact Us</h2>
+            <p><b>Location:</b> Governor Pack Road, Baguio City, 2600 Benguet, Philippines</p>
+            <p><b>Number:</b> (074) 442 3316</p>
+        </div>
+        <div class="footer-section">
+            <h2> <i class="fa-regular fa-heart"></i> Social Media</h2>
+            <p><b>Facebook Pages:</b></p>
+            <ul>
+                <li><a href="https://www.facebook.com/UCjaguars" target="_blank">University of the Cordilleras Main</a></li>
+                <li><a href="https://www.facebook.com/profile.php?id=100095333422873" target="_blank">University of the Cordilleras Integrated School</a></li>
+                <li><a href="https://www.facebook.com/profile.php?id=100086652038016" target="_blank">University of the Cordilleras STEM Society</a></li>
+                
+                <li><h4>Discord Account:</h4> <a href="https://discord.com/invite/WzKjsMNJTz?fbclid=IwZXh0bgNhZW0CMTEAAR16hWnkV-CPPQCbIBbPKtt9RWL0oVXKhPO3S7PaAE1qZAYDvkvOYpNemH4_aem_YkEnVghO2UHNHANBrTw0vQ" target="_blank">STEM Society Discord</a>
+                </li>
+
+                <li><h4>Instagram: </h4><a href="https://www.instagram.com/katangkay_society/?utm_source=ig_web_button_share_sheet" target="_blank">Katangkay Society</a></li>
+                
+            </ul>
+            
+        </div>
+        <div class="footer-section">
+            <h2><i class="fa-regular fa-envelope"></i> Email Addresses</h2>
+            <ul>
+                <li><a href="email@uc-bcf.edu.ph">University of the Cordilleras Email address</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2025 University of the Cordilleras Integrated School STEM Society. All Rights Reserved.</p>
+    </div>
+</footer>
+
+<script>
+// ------------------------------
+// QUIZ CONFIGURATION
+// ------------------------------
+
+// Empty array — add your own questions here later
+// Example: { question: "Text?", options: ["A", "B", "C", "D"], correct: 0 }
+const quizData = [];
+
+// Game settings
+const MAX_LIVES = 3;
+const QUESTION_TIME = 10; // seconds per question
+
+// ------------------------------
+// GAME VARIABLES
+// ------------------------------
+let currentQuestion = 0;
+let lives = MAX_LIVES;
+let timeLeft = QUESTION_TIME;
+let score = 0;
+let timer;
+
+// ------------------------------
+// DOM ELEMENTS
+// ------------------------------
+const livesEl = document.getElementById('lives');
+const timerEl = document.getElementById('timer');
+const questionEl = document.getElementById('question');
+const answersEl = document.getElementById('answers');
+const startBtn = document.getElementById('startBtn');
+const gameOverEl = document.getElementById('gameOver');
+const quizEl = document.getElementById('quiz');
+
+// ------------------------------
+// FUNCTIONS
+// ------------------------------
+function shuffleArray(array) {
+    return array.sort(() => Math.random() - 0.5);
+}
+
+function startGame() {
+    if (quizData.length === 0) {
+        alert("No questions available! Please add questions to quizData.");
+        return;
+    }
+    shuffleArray(quizData);
+    startBtn.style.display = 'none';
+    quizEl.style.display = 'block';
+    lives = MAX_LIVES;
+    score = 0;
+    currentQuestion = 0;
+    updateLives();
+    loadQuestion();
+}
+
+function loadQuestion() {
+    if (currentQuestion >= quizData.length) {
+        endGame();
+        return;
+    }
+    const q = quizData[currentQuestion];
+    questionEl.textContent = q.question;
+    answersEl.innerHTML = '';
+    q.options.forEach((option, index) => {
+        const btn = document.createElement('button');
+        btn.textContent = option;
+        btn.className = 'answer';
+        btn.onclick = () => checkAnswer(index);
+        answersEl.appendChild(btn);
+    });
+    resetTimer();
+}
+
+function checkAnswer(selectedIndex) {
+    const correctIndex = quizData[currentQuestion].correct;
+    if (selectedIndex === correctIndex) {
+        score++;
+        currentQuestion++;
+        loadQuestion();
+    } else {
+        loseLife();
+    }
+}
+
+function loseLife() {
+    lives--;
+    updateLives();
+    if (lives <= 0) {
+        endGame();
+    } else {
+        currentQuestion++;
+        loadQuestion();
+    }
+}
+
+function updateLives() {
+    livesEl.textContent = `Lives: ${lives}`;
+}
+
+function resetTimer() {
+    clearInterval(timer);
+    timeLeft = QUESTION_TIME;
+    timerEl.textContent = `Time: ${timeLeft}`;
+    timer = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = `Time: ${timeLeft}`;
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            loseLife();
+        }
+    }, 1000);
+}
+
+function endGame() {
+    clearInterval(timer);
+    quizEl.style.display = 'none';
+    gameOverEl.style.display = 'block';
+    gameOverEl.innerHTML = `
+        <p>Game Over! Your score is ${score}.</p>
+        <button class="start-btn" onclick="location.reload()">Play Again</button>
+    `;
+}
+
+// ------------------------------
+// EVENT LISTENERS
+// ------------------------------
+startBtn.addEventListener('click', startGame);
+
+</script>
+</body>
+</html>
